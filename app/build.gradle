@@ -30,6 +30,14 @@ android {
         viewBinding true    //开启ViewBinding
     }
 
+    //加载lib下的so文件
+    sourceSets{
+        main{
+            jniLibs.srcDir 'libs'
+            jni.srcDirs = []    //disable automatic ndk-build
+        }
+    }
+
 }
 
 dependencies {
