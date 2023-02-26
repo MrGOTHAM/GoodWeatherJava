@@ -66,17 +66,15 @@ public class NetworkApi {
         return new ObservableTransformer<T, T>() {
             @Override
             public ObservableSource<T> apply(Observable<T> upstream) {
-                Observable<T> observable = upstream.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        //判断有没有500的错误，有则进入getAppErrorHandler
-                        .map(NetworkApi.<T>getAppErrorHandler())
-                        //判断有没有400的错误
-                        .onErrorResumeNext(new HttpErrorHandler<T>());
+                Observable<T> observable = upstream
+                        .subscribeOn(Schedulers.io())//线程订阅
+                        .observeOn(AndroidSchedulers.mainThread())//观察Android主线程
+                        .map(NetworkApi.<T>getAppErrorHandler())//判断有没有500的错误，有则进入getAppErrorHandler
+                        .onErrorResumeNext(new HttpErrorHandler<T>());//判断有没有400的错误
                 //这里还少了对异常
                 //订阅观察者
                 observable.subscribe(observer);
                 return observable;
-
             }
         };
     }
@@ -134,6 +132,9 @@ public class NetworkApi {
         switch (apiType) {
             case SEARCH:
                 sBaseUrl = "https://geoapi.qweather.com"; //和风天气搜索城市
+                break;
+            case WEATHER:
+                sBaseUrl = "https://devapi.qweather.com";  // 和风天气API
                 break;
             default:
                 break;
