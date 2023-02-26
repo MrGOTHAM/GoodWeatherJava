@@ -3,47 +3,41 @@ package com.acg.goodweatherjava;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
+import com.acg.goodweatherjava.bean.SearchCityResponse;
 import com.acg.goodweatherjava.databinding.ActivityMainBinding;
 import com.acg.goodweatherjava.location.LocationCallback;
 import com.acg.goodweatherjava.location.MyLocationListener;
+import com.acg.goodweatherjava.viewModel.MainViewModel;
+import com.acg.library.base.NetworkActivity;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
-public class MainActivity extends AppCompatActivity implements LocationCallback {
+import java.util.List;
+
+public class MainActivity extends NetworkActivity<ActivityMainBinding> implements LocationCallback {
     private LocationClient mLocationClient;
-    private MyLocationListener mMyLocationListener = new MyLocationListener();
-    private ActivityMainBinding mBinding;
+    private final MyLocationListener mMyLocationListener = new MyLocationListener();
+    private MainViewModel mViewModel;
 
     //权限数组
     private final String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     //请求权限意图
     private ActivityResultLauncher<String[]> requestPermissionIntent;
 
-
+    /**
+     * 注册意图
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        registerIntent();                   // 需要在Activity初始化之前注册权限意图
-        super.onCreate(savedInstanceState);
-        mBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(mBinding.getRoot());
-
-        initLocation();
-        requestPermission();
-    }
-
-    private void startLocation() {
-        if (mLocationClient != null) {
-            mLocationClient.start();
-        }
-    }
-
-    private void registerIntent() {
+    protected void onRegister() {
         //请求权限意图
         requestPermissionIntent = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
             boolean fineLocation = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
@@ -53,6 +47,32 @@ public class MainActivity extends AppCompatActivity implements LocationCallback 
                 startLocation();
             }
         });
+    }
+
+    /**
+     * 初始化
+     */
+    @Override
+    protected void onCreate() {
+        initLocation();
+        requestPermission();
+        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+    }
+
+    /**
+     * 数据观察
+     */
+    @Override
+    protected void onObserverData() {
+        if (mViewModel != null) {
+            mViewModel.mSearchCityRepositoryMutableLiveData.observe(this, searchCityResponse -> {
+                List<SearchCityResponse.LocationBean> location = searchCityResponse.getLocation();
+                if (location != null && location.size() > 0) {
+                    String id = location.get(0).getId();
+                    Log.d("TAG", "城市ID: " + id);
+                }
+            });
+        }
     }
 
     // 申请权限弹框
@@ -68,7 +88,9 @@ public class MainActivity extends AppCompatActivity implements LocationCallback 
         startLocation();
     }
 
-
+    /**
+     * 初始化定位
+     */
     private void initLocation() {
         try {
             mLocationClient = new LocationClient(getApplicationContext());
@@ -89,6 +111,20 @@ public class MainActivity extends AppCompatActivity implements LocationCallback 
         }
     }
 
+    /**
+     * 开始定位
+     */
+    private void startLocation() {
+        if (mLocationClient != null) {
+            mLocationClient.start();
+        }
+    }
+
+    /**
+     * 接收定位信息
+     *
+     * @param bdLocation 定位数据
+     */
     @Override
     public void onReceiveLocation(BDLocation bdLocation) {
         double latitude = bdLocation.getLatitude();    //获取纬度信息
@@ -105,7 +141,12 @@ public class MainActivity extends AppCompatActivity implements LocationCallback 
         String district = bdLocation.getDistrict();    //获取区县
         String street = bdLocation.getStreet();    //获取街道信息
         String locationDescribe = bdLocation.getLocationDescribe();    //获取位置描述信息
-
         mBinding.tvAddressDetail.setText(addr);//设置文本显示
+        if (mViewModel != null && district != null) {
+            //搜索城市
+            mViewModel.searchCity(district, true);
+        } else {
+            Log.e("TAG", "district: " + district);
+        }
     }
 }
