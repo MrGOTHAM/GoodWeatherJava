@@ -14,7 +14,7 @@ import com.acg.library.network.observer.BaseObserver;
 
 /**
  * @Classname SearchCityRepository
- * @Description TODO
+ * @Description 由于这个类使用的接口并不多，并不是常用的仓库，因此先不实现静态内部类的单例模式
  * @Version 1.0.0
  * @Date 2023/2/26 1:33
  * @Created by an

@@ -1,10 +1,8 @@
 package com.acg.goodweatherjava.viewModel;
 
-import android.util.Log;
-
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.acg.goodweatherjava.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.bean.NowResponse;
 import com.acg.goodweatherjava.bean.SearchCityResponse;
 import com.acg.goodweatherjava.repository.SearchCityRepository;
@@ -24,6 +22,8 @@ public class MainViewModel extends BaseViewModel {
 
     public MutableLiveData<NowResponse> nowResponseMutableLiveData = new MutableLiveData<>();
 
+    public MutableLiveData<DailyWeatherResponse> dailyWeatherResponseMutableLiveData = new MutableLiveData<>();
+
     /**
      * 搜索城市
      *
@@ -39,6 +39,14 @@ public class MainViewModel extends BaseViewModel {
      * @param cityId 城市ID
      */
     public void nowWeather(String cityId) {
-        new WeatherRepository().nowWeather(nowResponseMutableLiveData, failed, cityId);
+        WeatherRepository.getInstance().nowWeather(nowResponseMutableLiveData, failed, cityId);
+    }
+
+    /**
+     * 每日天气
+     * @param cityId 城市ID
+     */
+    public void dailyWeather(String cityId){
+        WeatherRepository.getInstance().dailyWeather(dailyWeatherResponseMutableLiveData,failed,cityId);
     }
 }

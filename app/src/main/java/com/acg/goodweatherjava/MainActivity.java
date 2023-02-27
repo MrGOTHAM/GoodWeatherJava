@@ -4,13 +4,17 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.acg.goodweatherjava.adapter.DailyAdapter;
+import com.acg.goodweatherjava.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.bean.NowResponse;
 import com.acg.goodweatherjava.bean.SearchCityResponse;
 import com.acg.goodweatherjava.databinding.ActivityMainBinding;
@@ -22,6 +26,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends NetworkActivity<ActivityMainBinding> implements LocationCallback {
@@ -33,6 +38,18 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     private final String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     //请求权限意图
     private ActivityResultLauncher<String[]> requestPermissionIntent;
+
+    // 天气预报相关
+    private final List<DailyWeatherResponse.DailyBean> mDailyBeanList = new ArrayList<>();
+    private final DailyAdapter mDailyAdapter = new DailyAdapter(mDailyBeanList);
+
+    /**
+     * 天气预报
+     */
+    private void initView(){
+        mBinding.rvDaily.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.rvDaily.setAdapter(mDailyAdapter);
+    }
 
     /**
      * 注册意图
@@ -58,12 +75,14 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         setFullScreenImmersion();       // 全屏沉浸式
         initLocation();
         requestPermission();
+        initView();
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
     }
 
     /**
      * 数据观察
      */
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     protected void onObserverData() {
         if (mViewModel == null) {
@@ -78,6 +97,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                 if (id != null) {
                     //通过城市ID查询城市实时天气
                     mViewModel.nowWeather(id);
+                    mViewModel.dailyWeather(id);
                 }
             }
         });
@@ -88,6 +108,17 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                 mBinding.tvInfo.setText(now.getText());
                 mBinding.tvTemp.setText(now.getTemp());
                 mBinding.tvUpdateTime.setText("最近更新时间：" + nowResponse.getUpdateTime());
+            }
+        });
+        // 每日天气返回
+        mViewModel.dailyWeatherResponseMutableLiveData.observe(this,response->{
+            List<DailyWeatherResponse.DailyBean> dailyBeans = response.getDaily();
+            if (dailyBeans!=null){
+                if (mDailyBeanList.size() >0){
+                    mDailyBeanList.clear();
+                }
+                mDailyBeanList.addAll(dailyBeans);
+                mDailyAdapter.notifyDataSetChanged();
             }
         });
         // 错误信息返回

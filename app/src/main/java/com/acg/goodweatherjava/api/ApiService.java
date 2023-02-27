@@ -2,6 +2,7 @@ package com.acg.goodweatherjava.api;
 
 import static com.acg.goodweatherjava.Constant.API_KEY;
 
+import com.acg.goodweatherjava.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.bean.NowResponse;
 import com.acg.goodweatherjava.bean.SearchCityResponse;
 
@@ -28,10 +29,18 @@ public interface ApiService {
 
     /**
      * 实况天气
-     * @param location
+     * @param location 地区id
      * @return
      */
     @GET("/v7/weather/now?key=" + API_KEY)
     Observable<NowResponse> nowWeather(@Query("location") String location);
+
+    /**
+     * 每日天气，默认预测7天
+     * @param location 地区id
+     * @return
+     */
+    @GET("v7/weather/7d?key="+API_KEY)
+    Observable<DailyWeatherResponse> dailyWeather(@Query("location") String location);
 
 }
