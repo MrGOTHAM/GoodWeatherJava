@@ -2,16 +2,21 @@ package com.acg.goodweatherjava;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.acg.goodweatherjava.adapter.DailyAdapter;
 import com.acg.goodweatherjava.adapter.LifestyleAdapter;
@@ -53,6 +58,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
      * 天气预报
      */
     private void initView() {
+        setToolbarMoreIconCustom(mBinding.materialToolbar);
         mBinding.rvDaily.setLayoutManager(new LinearLayoutManager(this));
         mBinding.rvDaily.setAdapter(mDailyAdapter);
         mBinding.rvLifestyle.setLayoutManager(new LinearLayoutManager(this));
@@ -214,5 +220,37 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         } else {
             Log.e("TAG", "district: " + district);
         }
+    }
+
+    /**
+     * 设置toolbar图标
+     * @param toolbar
+     */
+    public void setToolbarMoreIconCustom(Toolbar toolbar){
+        if (toolbar != null){
+            toolbar.setTitle("");
+            Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(),R.drawable.ic_round_add_32);
+            if (moreIcon !=null) toolbar.setOverflowIcon(moreIcon);
+            setSupportActionBar(toolbar);
+        }
+    }
+
+    /**
+     * 设置菜单
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.item_switching_cities){
+            showToast("切换城市");
+        }
+        return true;
     }
 }
