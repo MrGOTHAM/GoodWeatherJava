@@ -1,4 +1,4 @@
-package com.acg.goodweatherjava;
+package com.acg.goodweatherjava.ui;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.acg.goodweatherjava.R;
 import com.acg.goodweatherjava.adapter.DailyAdapter;
 import com.acg.goodweatherjava.adapter.LifestyleAdapter;
 import com.acg.goodweatherjava.bean.DailyWeatherResponse;
@@ -229,7 +230,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     public void setToolbarMoreIconCustom(Toolbar toolbar){
         if (toolbar != null){
             toolbar.setTitle("");
-            Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(),R.drawable.ic_round_add_32);
+            Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(), R.drawable.ic_round_add_32);
             if (moreIcon !=null) toolbar.setOverflowIcon(moreIcon);
             setSupportActionBar(toolbar);
         }
