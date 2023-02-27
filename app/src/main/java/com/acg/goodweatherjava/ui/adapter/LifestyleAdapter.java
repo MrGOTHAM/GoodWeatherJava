@@ -1,4 +1,4 @@
-package com.acg.goodweatherjava.adapter;
+package com.acg.goodweatherjava.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.acg.goodweatherjava.bean.LifestyleResponse;
+import com.acg.goodweatherjava.db.bean.LifestyleResponse;
 import com.acg.goodweatherjava.databinding.ItemLifestyleRvBinding;
 
 import java.util.List;

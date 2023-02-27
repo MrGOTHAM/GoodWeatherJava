@@ -3,7 +3,6 @@ package com.acg.goodweatherjava.ui;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -13,21 +12,21 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.acg.goodweatherjava.R;
-import com.acg.goodweatherjava.adapter.DailyAdapter;
-import com.acg.goodweatherjava.adapter.LifestyleAdapter;
-import com.acg.goodweatherjava.bean.DailyWeatherResponse;
-import com.acg.goodweatherjava.bean.LifestyleResponse;
-import com.acg.goodweatherjava.bean.NowResponse;
-import com.acg.goodweatherjava.bean.SearchCityResponse;
+import com.acg.goodweatherjava.ui.adapter.DailyAdapter;
+import com.acg.goodweatherjava.ui.adapter.LifestyleAdapter;
+import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.db.bean.LifestyleResponse;
+import com.acg.goodweatherjava.db.bean.NowResponse;
+import com.acg.goodweatherjava.db.bean.SearchCityResponse;
 import com.acg.goodweatherjava.databinding.ActivityMainBinding;
 import com.acg.goodweatherjava.location.LocationCallback;
 import com.acg.goodweatherjava.location.MyLocationListener;
+import com.acg.goodweatherjava.utils.CityDialog;
 import com.acg.goodweatherjava.viewModel.MainViewModel;
 import com.acg.library.base.NetworkActivity;
 import com.baidu.location.BDLocation;
@@ -37,7 +36,7 @@ import com.baidu.location.LocationClientOption;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends NetworkActivity<ActivityMainBinding> implements LocationCallback {
+public class MainActivity extends NetworkActivity<ActivityMainBinding> implements LocationCallback ,CityDialog.SelectedCityCallback{
     private LocationClient mLocationClient;
     private final MyLocationListener mMyLocationListener = new MyLocationListener();
     private MainViewModel mViewModel;
@@ -54,6 +53,10 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     // 生活指数相关
     private final List<LifestyleResponse.DailyBean> mLifestyleList = new ArrayList<>();
     private final LifestyleAdapter mLifestyleAdapter = new LifestyleAdapter(mLifestyleList);
+
+    //城市弹窗
+    private CityDialog cityDialog;
+
 
     /**
      * 天气预报
@@ -92,6 +95,8 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         requestPermission();
         initView();
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        // 获取城市数据
+        mViewModel.getAllCity();
     }
 
     /**
@@ -154,6 +159,13 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                 mLifestyleAdapter.notifyDataSetChanged();
             }
         });
+        // 城市数据返回
+        mViewModel.cityMutableLiveData.observe(this, provinces -> {
+            //城市弹窗初始化
+            cityDialog = CityDialog.getInstance(MainActivity.this, provinces);
+            cityDialog.setSelectedCityCallback(this);
+        });
+
         // 错误信息返回
         mViewModel.failed.observe(this, this::showLongToast);
 
@@ -250,8 +262,16 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.item_switching_cities){
-            showToast("切换城市");
+            if (cityDialog!=null) cityDialog.show();
         }
         return true;
+    }
+
+    @Override
+    public void selectedCity(String cityName) {
+        //搜索城市
+        mViewModel.searchCity(cityName);
+        //显示所选城市
+        mBinding.tvCity.setText(cityName);
     }
 }

@@ -1,8 +1,11 @@
 package com.acg.goodweatherjava;
 
+import com.acg.goodweatherjava.db.AppDatabase;
+import com.acg.goodweatherjava.utils.MVUtils;
 import com.acg.library.base.BaseApplication;
 import com.acg.library.network.NetworkApi;
 import com.baidu.location.LocationClient;
+import com.tencent.mmkv.MMKV;
 
 /**
  * @Classname WeatherApp
@@ -13,6 +16,8 @@ import com.baidu.location.LocationClient;
  */
 public class WeatherApp extends BaseApplication {
 
+    // 数据库
+    private static AppDatabase db;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -20,5 +25,15 @@ public class WeatherApp extends BaseApplication {
         LocationClient.setAgreePrivacy(true);
         // 初始化网络框架
         NetworkApi.init(new NetworkRequiredInfo(this));
+        //  MMKV初始化
+        MMKV.initialize(this);
+        // 工具类初始化
+        MVUtils.getInstance();
+        // 初始化Room数据库
+        db = AppDatabase.getInstance(this);
+    }
+
+    public static AppDatabase getDb(){
+        return db;
     }
 }

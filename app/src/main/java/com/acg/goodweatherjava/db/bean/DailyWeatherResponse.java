@@ -1,4 +1,4 @@
-package com.acg.goodweatherjava.bean;
+package com.acg.goodweatherjava.db.bean;
 
 import java.io.Serializable;
 import java.util.List;

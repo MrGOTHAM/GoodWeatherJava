@@ -2,10 +2,10 @@ package com.acg.goodweatherjava.api;
 
 import static com.acg.goodweatherjava.Constant.API_KEY;
 
-import com.acg.goodweatherjava.bean.DailyWeatherResponse;
-import com.acg.goodweatherjava.bean.LifestyleResponse;
-import com.acg.goodweatherjava.bean.NowResponse;
-import com.acg.goodweatherjava.bean.SearchCityResponse;
+import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.db.bean.LifestyleResponse;
+import com.acg.goodweatherjava.db.bean.NowResponse;
+import com.acg.goodweatherjava.db.bean.SearchCityResponse;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
