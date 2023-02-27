@@ -117,6 +117,12 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                 mBinding.tvInfo.setText(now.getText());
                 mBinding.tvTemp.setText(now.getTemp());
                 mBinding.tvUpdateTime.setText("最近更新时间：" + nowResponse.getUpdateTime());
+
+                mBinding.tvWindDirection.setText("风向     " + now.getWindDir());//风向
+                mBinding.tvWindPower.setText("风力     " + now.getWindScale() + "级");//风力
+                mBinding.wwBig.startRotate();//大风车开始转动
+                mBinding.wwSmall.startRotate();//小风车开始转动
+
             }
         });
         // 每日天气返回
