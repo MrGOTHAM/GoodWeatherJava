@@ -3,6 +3,7 @@ package com.acg.goodweatherjava.viewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.acg.goodweatherjava.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.bean.LifestyleResponse;
 import com.acg.goodweatherjava.bean.NowResponse;
 import com.acg.goodweatherjava.bean.SearchCityResponse;
 import com.acg.goodweatherjava.repository.SearchCityRepository;
@@ -23,6 +24,8 @@ public class MainViewModel extends BaseViewModel {
     public MutableLiveData<NowResponse> nowResponseMutableLiveData = new MutableLiveData<>();
 
     public MutableLiveData<DailyWeatherResponse> dailyWeatherResponseMutableLiveData = new MutableLiveData<>();
+
+    public MutableLiveData<LifestyleResponse> lifestyleResponseMutableLiveData = new MutableLiveData<>();
 
     /**
      * 搜索城市
@@ -49,4 +52,13 @@ public class MainViewModel extends BaseViewModel {
     public void dailyWeather(String cityId){
         WeatherRepository.getInstance().dailyWeather(dailyWeatherResponseMutableLiveData,failed,cityId);
     }
+
+    /**
+     * 生活指数
+     * @param cityId    城市ID
+     */
+    public void lifestyle(String cityId){
+        WeatherRepository.getInstance().lifeStyle(lifestyleResponseMutableLiveData,failed,cityId);
+    }
+
 }

@@ -14,7 +14,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.acg.goodweatherjava.adapter.DailyAdapter;
+import com.acg.goodweatherjava.adapter.LifestyleAdapter;
 import com.acg.goodweatherjava.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.bean.LifestyleResponse;
 import com.acg.goodweatherjava.bean.NowResponse;
 import com.acg.goodweatherjava.bean.SearchCityResponse;
 import com.acg.goodweatherjava.databinding.ActivityMainBinding;
@@ -43,12 +45,18 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     private final List<DailyWeatherResponse.DailyBean> mDailyBeanList = new ArrayList<>();
     private final DailyAdapter mDailyAdapter = new DailyAdapter(mDailyBeanList);
 
+    // 生活指数相关
+    private final List<LifestyleResponse.DailyBean> mLifestyleList = new ArrayList<>();
+    private final LifestyleAdapter mLifestyleAdapter = new LifestyleAdapter(mLifestyleList);
+
     /**
      * 天气预报
      */
-    private void initView(){
+    private void initView() {
         mBinding.rvDaily.setLayoutManager(new LinearLayoutManager(this));
         mBinding.rvDaily.setAdapter(mDailyAdapter);
+        mBinding.rvLifestyle.setLayoutManager(new LinearLayoutManager(this));
+        mBinding.rvLifestyle.setAdapter(mLifestyleAdapter);
     }
 
     /**
@@ -98,6 +106,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                     //通过城市ID查询城市实时天气
                     mViewModel.nowWeather(id);
                     mViewModel.dailyWeather(id);
+                    mViewModel.lifestyle(id);
                 }
             }
         });
@@ -111,14 +120,25 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
             }
         });
         // 每日天气返回
-        mViewModel.dailyWeatherResponseMutableLiveData.observe(this,response->{
+        mViewModel.dailyWeatherResponseMutableLiveData.observe(this, response -> {
             List<DailyWeatherResponse.DailyBean> dailyBeans = response.getDaily();
-            if (dailyBeans!=null){
-                if (mDailyBeanList.size() >0){
+            if (dailyBeans != null) {
+                if (mDailyBeanList.size() > 0) {
                     mDailyBeanList.clear();
                 }
                 mDailyBeanList.addAll(dailyBeans);
                 mDailyAdapter.notifyDataSetChanged();
+            }
+        });
+        // 生活指数返回
+        mViewModel.lifestyleResponseMutableLiveData.observe(this, lifestyleResponse -> {
+            List<LifestyleResponse.DailyBean> dailyList = lifestyleResponse.getDaily();
+            if (dailyList != null) {
+                if (mLifestyleList.size() > 0) {
+                    mLifestyleList.clear();
+                }
+                mLifestyleList.addAll(dailyList);
+                mLifestyleAdapter.notifyDataSetChanged();
             }
         });
         // 错误信息返回

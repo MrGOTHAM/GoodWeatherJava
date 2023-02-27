@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/code/WorkPlace/AndroidWorkPlace/GoodWeatherJava/app/src/main/res/layout/activity_main.xml" value="0.3836050724637681" />
+        <entry key="..\:/code/WorkPlace/AndroidWorkPlace/GoodWeatherJava/app/src/main/res/layout/item_daily_rv.xml" value="0.20618034447821681" />
         <entry key="..\:/code/WorkPlace/AndroidWorkPlace/GoodWeatherJava/app/src/main/res/layout/item_daily_rv_item.xml" value="0.4239583333333333" />
+        <entry key="..\:/code/WorkPlace/AndroidWorkPlace/GoodWeatherJava/app/src/main/res/layout/item_lifestyle_rv.xml" value="0.42291666666666666" />
       </map>
     </option>
   </component>

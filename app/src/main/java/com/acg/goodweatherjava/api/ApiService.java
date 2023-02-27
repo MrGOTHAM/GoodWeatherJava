@@ -3,6 +3,7 @@ package com.acg.goodweatherjava.api;
 import static com.acg.goodweatherjava.Constant.API_KEY;
 
 import com.acg.goodweatherjava.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.bean.LifestyleResponse;
 import com.acg.goodweatherjava.bean.NowResponse;
 import com.acg.goodweatherjava.bean.SearchCityResponse;
 
@@ -43,4 +44,12 @@ public interface ApiService {
     @GET("v7/weather/7d?key="+API_KEY)
     Observable<DailyWeatherResponse> dailyWeather(@Query("location") String location);
 
+    /**
+     * 生活指数
+     * @param types     默认1，2，3，4，5，6，7；每个数字对应一个类型，拼接在一起代表多个指数都查
+     * @param cityId    地区ID
+     * @return
+     */
+    @GET("v7/indices/1d?key="+API_KEY)
+    Observable<LifestyleResponse> lifestyle(@Query("type") String types,@Query("location") String cityId);
 }

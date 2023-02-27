@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.acg.goodweatherjava.Constant;
 import com.acg.goodweatherjava.api.ApiService;
 import com.acg.goodweatherjava.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.bean.LifestyleResponse;
 import com.acg.goodweatherjava.bean.NowResponse;
 import com.acg.library.network.ApiType;
 import com.acg.library.network.NetworkApi;
@@ -27,15 +28,17 @@ public class WeatherRepository {
 
     // 单例模式，防止每次使用WeatherRepository都建立一个WeatherRepository
     // 静态内部类方式构建单例
-    private final static class WeatherRepositoryHolder{
+    private final static class WeatherRepositoryHolder {
         private static final WeatherRepository mInstance = new WeatherRepository();
     }
 
-    public static WeatherRepository getInstance(){
+    public static WeatherRepository getInstance() {
         return WeatherRepositoryHolder.mInstance;
     }
 
-    private WeatherRepository(){}
+    private WeatherRepository() {
+    }
+
     /**
      * 实况天气
      *
@@ -72,9 +75,10 @@ public class WeatherRepository {
 
     /**
      * 每日天气
-     * @param responseLiveData  来自viewModel的数据
-     * @param failed            失败数据
-     * @param cityId            城市ID
+     *
+     * @param responseLiveData 来自viewModel的数据
+     * @param failed           失败数据
+     * @param cityId           城市ID
      */
     public void dailyWeather(MutableLiveData<DailyWeatherResponse> responseLiveData,
                              MutableLiveData<String> failed, String cityId) {
@@ -92,6 +96,38 @@ public class WeatherRepository {
                             responseLiveData.postValue(dailyWeatherResponse);
                         } else {
                             failed.postValue(type + dailyWeatherResponse.getCode());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable e) {
+                        Log.e(TAG, "onFailure: " + e.getMessage());
+                        failed.postValue(type + e.getMessage());
+                    }
+                }));
+    }
+
+    /**
+     * 生活指数
+     * @param responseLiveData  来自viewModel的数据，这里给他更新
+     * @param failed            失败的数据
+     * @param cityId            城市ID
+     */
+    public void lifeStyle(MutableLiveData<LifestyleResponse> responseLiveData,
+                          MutableLiveData<String> failed, String cityId) {
+        String type = "生活指数 -->";
+        NetworkApi.createService(ApiService.class, ApiType.WEATHER).lifestyle("1,2,3,4,5,6,7,8,9", cityId)
+                .compose(NetworkApi.applySchedulers(new BaseObserver<LifestyleResponse>() {
+                    @Override
+                    public void onSuccess(LifestyleResponse lifestyleResponse) {
+                        if (lifestyleResponse == null) {
+                            failed.postValue("生活指数数据为null，请检查城市ID是否正确！");
+                            return;
+                        }
+                        if (Constant.SUCCESS.equals(lifestyleResponse.getCode())) {
+                            responseLiveData.postValue(lifestyleResponse);
+                        } else {
+                            failed.postValue(type + lifestyleResponse.getCode());
                         }
                     }
 
