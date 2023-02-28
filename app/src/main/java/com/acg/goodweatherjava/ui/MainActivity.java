@@ -57,6 +57,12 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     // 定位服务
     private GoodLocation mGoodLocation;
 
+    // 菜单，如果看的不是本地天气，
+    // 则显示定位按钮，否则不显示
+    private Menu mMenu;
+    // 城市信息来源标识 0：定位，1：切换城市
+    private int mCityFlag = 0;
+
 
     /**
      * 天气预报
@@ -113,6 +119,8 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
             List<SearchCityResponse.LocationBean> location = searchCityResponse.getLocation();
             if (location != null && location.size() > 0) {
                 String id = location.get(0).getId();
+                // 根据cityFlag设置重新定位菜单项是否显示
+                mMenu.findItem(R.id.item_relocation).setVisible(mCityFlag == 1);
                 //获取到城市的ID
                 if (id != null) {
                     //通过城市ID查询城市实时天气
@@ -196,6 +204,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
      * 开始定位
      */
     private void startLocation() {
+        mCityFlag = 0;
         mGoodLocation.startLocation();
     }
 
@@ -239,13 +248,21 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main,menu);
+        mMenu = menu;
+        // 根据cityFlag设置重新定位菜单项是否显示
+        mMenu.findItem(R.id.item_relocation).setVisible(mCityFlag == 1);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.item_switching_cities){
-            if (cityDialog!=null) cityDialog.show();
+        switch (item.getItemId()) {
+            case R.id.item_switching_cities:
+                if (cityDialog != null) cityDialog.show();
+                break;
+            case R.id.item_relocation:
+                startLocation();    // 重新定位
+                break;
         }
         return true;
     }
@@ -257,6 +274,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
      */
     @Override
     public void selectedCity(String cityName) {
+        mCityFlag = 1;  // 切换城市
         //搜索城市
         mViewModel.searchCity(cityName);
         //显示所选城市
