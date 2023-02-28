@@ -26,7 +26,17 @@
             android:textSize="@dimen/sp_16" />
     </com.google.android.material.appbar.MaterialToolbar>
 
+    <!--下拉刷新视图-->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/lay_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/materialToolbar">
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/lay_scroll"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_0"
         app:layout_constraintTop_toBottomOf="@id/materialToolbar">
@@ -193,4 +203,5 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

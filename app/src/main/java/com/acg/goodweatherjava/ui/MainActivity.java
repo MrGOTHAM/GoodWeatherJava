@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -66,6 +67,12 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     // 城市信息来源标识 0：定位，1：切换城市
     private int mCityFlag = 0;
 
+    //城市名称，定位和切换城市都会重新赋值。
+    private String mCityName;
+    //是否正在刷新
+    private boolean isRefresh;
+
+
 
     /**
      * 天气预报
@@ -76,6 +83,16 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         mBinding.rvDaily.setAdapter(mDailyAdapter);
         mBinding.rvLifestyle.setLayoutManager(new LinearLayoutManager(this));
         mBinding.rvLifestyle.setAdapter(mLifestyleAdapter);
+        mBinding.layRefresh.setOnRefreshListener(() -> {
+            if (mCityName == null){
+                mBinding.layRefresh.setRefreshing(false);
+                return;
+            }
+            // 设置正在刷新
+            isRefresh = true;
+            // 搜索城市
+            mViewModel.searchCity(mCityName);
+        });
     }
 
     /**
@@ -124,6 +141,12 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                 String id = location.get(0).getId();
                 // 根据cityFlag设置重新定位菜单项是否显示
                 mMenu.findItem(R.id.item_relocation).setVisible(mCityFlag == 1);
+                // 检查到正在刷新
+                if (isRefresh){
+                    showToast("刷新完成！");
+                    mBinding.layRefresh.setRefreshing(false);
+                    isRefresh = false;
+                }
                 //获取到城市的ID
                 if (id != null) {
                     //通过城市ID查询城市实时天气
@@ -222,6 +245,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         String district = bdLocation.getDistrict(); // 获取区县
 
         if (mViewModel != null && district != null) {
+            mCityName = district;
             mBinding.tvCity.setText(district);
             //搜索城市
             mViewModel.searchCity(district);
@@ -290,6 +314,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     @Override
     public void selectedCity(String cityName) {
         mCityFlag = 1;  // 切换城市
+        mCityName = cityName;
         //搜索城市
         mViewModel.searchCity(cityName);
         //显示所选城市
