@@ -39,6 +39,7 @@ public class SplashActivity extends NetworkActivity<ActivitySplashBinding> {
         //检查启动
         checkingStartup();
         //checkFirstRunToday();
+        // 在UI线程安排一个Runnable对象，实现延时启动
         new Handler().postDelayed(() -> jumpActivityFinish(MainActivity.class), 1000);
     }
 

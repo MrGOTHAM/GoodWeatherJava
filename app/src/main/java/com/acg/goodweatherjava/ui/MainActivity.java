@@ -267,6 +267,11 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         return true;
     }
 
+    /**
+     * 回调接口，从dialog里选了地点之后，回调到这里，然后重新请求定位城市数据
+     * 城市数据的回收接口(来自rxjava的)里面会再请求其它接口
+     * @param cityName
+     */
     @Override
     public void selectedCity(String cityName) {
         //搜索城市

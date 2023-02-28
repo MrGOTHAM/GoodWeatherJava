@@ -31,7 +31,7 @@ public class CityDialog implements AdministrativeClickCallback {
     private static volatile CityDialog mInstance;
     @SuppressLint("StaticFieldLeak")
     private static Context mContext;
-    private BottomSheetDialog dialog;
+    private BottomSheetDialog dialog;       // 允许开发者以滑动对话框的形式在屏幕底部显示内容。
     private DialogCityBinding binding;
 
     private final List<Province> provinceList = new ArrayList<>();
