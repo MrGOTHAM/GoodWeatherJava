@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.acg.goodweatherjava.Constant;
 import com.acg.goodweatherjava.R;
 import com.acg.goodweatherjava.location.GoodLocation;
 import com.acg.goodweatherjava.ui.adapter.DailyAdapter;
@@ -27,6 +28,8 @@ import com.acg.goodweatherjava.db.bean.SearchCityResponse;
 import com.acg.goodweatherjava.databinding.ActivityMainBinding;
 import com.acg.goodweatherjava.location.LocationCallback;
 import com.acg.goodweatherjava.utils.CityDialog;
+import com.acg.goodweatherjava.utils.GlideUtils;
+import com.acg.goodweatherjava.utils.MVUtils;
 import com.acg.goodweatherjava.viewModel.MainViewModel;
 import com.acg.library.base.NetworkActivity;
 import com.baidu.location.BDLocation;
@@ -34,7 +37,7 @@ import com.baidu.location.BDLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends NetworkActivity<ActivityMainBinding> implements LocationCallback ,CityDialog.SelectedCityCallback{
+public class MainActivity extends NetworkActivity<ActivityMainBinding> implements LocationCallback, CityDialog.SelectedCityCallback {
 
     private MainViewModel mViewModel;
 
@@ -229,28 +232,32 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
 
     /**
      * 设置toolbar图标
+     *
      * @param toolbar
      */
-    public void setToolbarMoreIconCustom(Toolbar toolbar){
-        if (toolbar != null){
+    public void setToolbarMoreIconCustom(Toolbar toolbar) {
+        if (toolbar != null) {
             toolbar.setTitle("");
             Drawable moreIcon = ContextCompat.getDrawable(toolbar.getContext(), R.drawable.ic_round_add_32);
-            if (moreIcon !=null) toolbar.setOverflowIcon(moreIcon);
+            if (moreIcon != null) toolbar.setOverflowIcon(moreIcon);
             setSupportActionBar(toolbar);
         }
     }
 
     /**
      * 设置菜单
+     *
      * @param menu
      * @return
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main,menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         mMenu = menu;
         // 根据cityFlag设置重新定位菜单项是否显示
         mMenu.findItem(R.id.item_relocation).setVisible(mCityFlag == 1);
+        // 根据使用必应壁纸的状态，设置item项是否选中
+        mMenu.findItem(R.id.item_bing).setChecked(MVUtils.getBoolean(Constant.USED_BING));
         return true;
     }
 
@@ -263,6 +270,13 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
             case R.id.item_relocation:
                 startLocation();    // 重新定位
                 break;
+            case R.id.item_bing:
+                boolean useBing = !item.isChecked();
+                item.setChecked(useBing); // 是否选中了必应
+                MVUtils.put(Constant.USED_BING, useBing);
+                String bingUrl = MVUtils.getString(Constant.BING_URL);
+                updateBgImage(useBing, bingUrl); // 更新壁纸
+                break;
         }
         return true;
     }
@@ -270,6 +284,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     /**
      * 回调接口，从dialog里选了地点之后，回调到这里，然后重新请求定位城市数据
      * 城市数据的回收接口(来自rxjava的)里面会再请求其它接口
+     *
      * @param cityName
      */
     @Override
@@ -279,5 +294,25 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         mViewModel.searchCity(cityName);
         //显示所选城市
         mBinding.tvCity.setText(cityName);
+    }
+
+    /**
+     * 更新mainActivity的背景
+     *
+     * @param usedBing 是否使用必应壁纸
+     * @param bingUrl  壁纸的地址
+     */
+    public void updateBgImage(boolean usedBing, String bingUrl) {
+        if (usedBing && !bingUrl.isEmpty()) {
+            GlideUtils.loadImg(this, bingUrl, mBinding.layRoot);
+        } else {
+            mBinding.layRoot.setBackground(ContextCompat.getDrawable(this, R.drawable.main_bg));
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBgImage(MVUtils.getBoolean(Constant.USED_BING), MVUtils.getString(Constant.BING_URL));
     }
 }

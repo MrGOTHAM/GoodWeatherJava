@@ -136,6 +136,9 @@ public class NetworkApi {
             case WEATHER:
                 sBaseUrl = "https://devapi.qweather.com";  // 和风天气API
                 break;
+            case BING:
+                sBaseUrl = "https://cn.bing.com";           // 必应壁纸
+                break;
             default:
                 break;
         }

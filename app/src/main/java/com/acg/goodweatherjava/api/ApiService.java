@@ -2,6 +2,7 @@ package com.acg.goodweatherjava.api;
 
 import static com.acg.goodweatherjava.Constant.API_KEY;
 
+import com.acg.goodweatherjava.db.bean.BingResponse;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.db.bean.LifestyleResponse;
 import com.acg.goodweatherjava.db.bean.NowResponse;
@@ -52,4 +53,11 @@ public interface ApiService {
      */
     @GET("v7/indices/1d?key="+API_KEY)
     Observable<LifestyleResponse> lifestyle(@Query("type") String types,@Query("location") String cityId);
+
+    /**
+     * 必应图片
+     * @return
+     */
+    @GET("/HPImageArchive.aspx?format=js&idx=0&n=1")
+    Observable<BingResponse> bing();
 }

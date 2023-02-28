@@ -2,7 +2,9 @@ package com.acg.goodweatherjava.viewModel;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.acg.goodweatherjava.db.bean.BingResponse;
 import com.acg.goodweatherjava.db.bean.Province;
+import com.acg.goodweatherjava.repository.BingRepository;
 import com.acg.goodweatherjava.repository.CityRepository;
 import com.acg.library.base.BaseViewModel;
 
@@ -18,6 +20,7 @@ import java.util.List;
 public class SplashViewModel extends BaseViewModel {
 
     public MutableLiveData<List<Province>> listMutableLiveData = new MutableLiveData<>();
+    public MutableLiveData<BingResponse> bingMutableLiveData = new MutableLiveData<>();
 
     /**
      * 添加城市数据
@@ -31,5 +34,12 @@ public class SplashViewModel extends BaseViewModel {
      */
     public void getAllCityData() {
         CityRepository.getInstance().getCityData(listMutableLiveData);
+    }
+
+    /**
+     * 获取必应壁纸
+     */
+    public void bing(){
+        BingRepository.getInstance().bing(bingMutableLiveData,failed);
     }
 }
