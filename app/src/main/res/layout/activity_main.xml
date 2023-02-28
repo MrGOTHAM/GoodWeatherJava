@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -44,6 +45,14 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_0">
+            <!--滑动距离布局-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lay_scroll_height"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
             <!--天气状况-->
             <TextView
                 android:id="@+id/tv_info"
@@ -89,6 +98,7 @@
                 app:layout_constraintEnd_toEndOf="@+id/tv_temp"
                 app:layout_constraintStart_toStartOf="@+id/tv_temp"
                 app:layout_constraintTop_toBottomOf="@+id/tv_temp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
             <!--上一次更新时间-->
             <TextView
                 android:id="@+id/tv_update_time"
@@ -98,9 +108,9 @@
                 android:text="上次更新时间："
                 android:textColor="@color/white"
                 android:textSize="@dimen/sp_12"
-                app:layout_constraintEnd_toEndOf="@+id/tv_city"
-                app:layout_constraintStart_toStartOf="@+id/tv_city"
-                app:layout_constraintTop_toBottomOf="@+id/tv_city" />
+                app:layout_constraintEnd_toEndOf="@+id/lay_scroll_height"
+                app:layout_constraintStart_toStartOf="@+id/lay_scroll_height"
+                app:layout_constraintTop_toBottomOf="@+id/lay_scroll_height" />
             <!--未来7天的天气-->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_daily"

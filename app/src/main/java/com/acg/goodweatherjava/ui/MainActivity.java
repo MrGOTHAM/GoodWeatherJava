@@ -16,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.acg.goodweatherjava.Constant;
 import com.acg.goodweatherjava.R;
@@ -92,6 +93,20 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
             isRefresh = true;
             // 搜索城市
             mViewModel.searchCity(mCityName);
+        });
+        mBinding.layScroll.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                // 若layScroll滑动的距离 大于layScrollHeight的高度
+                if (scrollY > mBinding.layScrollHeight.getMeasuredHeight()){
+                    mBinding.tvTitle.setText(mCityName==null?"城市天气":mCityName);
+                }else if (scrollY < oldScrollY){
+                    if (scrollY < mBinding.layScrollHeight.getMeasuredHeight()){
+                        // 修改回原来的
+                        mBinding.tvTitle.setText("城市天气");
+                    }
+                }
+            }
         });
     }
 
