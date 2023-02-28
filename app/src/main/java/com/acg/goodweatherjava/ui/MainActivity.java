@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.acg.goodweatherjava.R;
+import com.acg.goodweatherjava.location.GoodLocation;
 import com.acg.goodweatherjava.ui.adapter.DailyAdapter;
 import com.acg.goodweatherjava.ui.adapter.LifestyleAdapter;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
@@ -25,20 +26,16 @@ import com.acg.goodweatherjava.db.bean.NowResponse;
 import com.acg.goodweatherjava.db.bean.SearchCityResponse;
 import com.acg.goodweatherjava.databinding.ActivityMainBinding;
 import com.acg.goodweatherjava.location.LocationCallback;
-import com.acg.goodweatherjava.location.MyLocationListener;
 import com.acg.goodweatherjava.utils.CityDialog;
 import com.acg.goodweatherjava.viewModel.MainViewModel;
 import com.acg.library.base.NetworkActivity;
 import com.baidu.location.BDLocation;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends NetworkActivity<ActivityMainBinding> implements LocationCallback ,CityDialog.SelectedCityCallback{
-    private LocationClient mLocationClient;
-    private final MyLocationListener mMyLocationListener = new MyLocationListener();
+
     private MainViewModel mViewModel;
 
     //权限数组
@@ -56,6 +53,9 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
 
     //城市弹窗
     private CityDialog cityDialog;
+
+    // 定位服务
+    private GoodLocation mGoodLocation;
 
 
     /**
@@ -188,32 +188,15 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
      * 初始化定位
      */
     private void initLocation() {
-        try {
-            mLocationClient = new LocationClient(getApplicationContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (mLocationClient != null) {
-            mMyLocationListener.setCallback(this);
-            // 注册监听器
-            mLocationClient.registerLocationListener(mMyLocationListener);
-            LocationClientOption option = new LocationClientOption();
-            // 如果开发者需要获得当前点的地址信息，此处必须为true
-            option.setIsNeedAddress(true);
-            // 可选，设置是否需要新版本的地址信息，默认不需要，即参数为false
-            option.setNeedNewVersionRgc(true);
-            // 需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
-            mLocationClient.setLocOption(option);
-        }
+        mGoodLocation = GoodLocation.getInstance(this);
+        mGoodLocation.setCallback(this);
     }
 
     /**
      * 开始定位
      */
     private void startLocation() {
-        if (mLocationClient != null) {
-            mLocationClient.start();
-        }
+        mGoodLocation.startLocation();
     }
 
     /**
