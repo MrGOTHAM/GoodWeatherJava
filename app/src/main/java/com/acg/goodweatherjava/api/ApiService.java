@@ -2,6 +2,7 @@ package com.acg.goodweatherjava.api;
 
 import static com.acg.goodweatherjava.Constant.API_KEY;
 
+import com.acg.goodweatherjava.db.bean.AirResponse;
 import com.acg.goodweatherjava.db.bean.BingResponse;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.db.bean.HourlyResponse;
@@ -69,4 +70,12 @@ public interface ApiService {
      */
     @GET("/HPImageArchive.aspx?format=js&idx=0&n=1")
     Observable<BingResponse> bing();
+
+    /**
+     * 空气污染指数
+     * @param location
+     * @return
+     */
+    @GET("v7/air/now?key="+API_KEY)
+    Observable<AirResponse> airWeather(@Query("location") String location);
 }

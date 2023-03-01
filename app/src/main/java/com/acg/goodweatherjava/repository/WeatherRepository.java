@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.acg.goodweatherjava.Constant;
 import com.acg.goodweatherjava.api.ApiService;
+import com.acg.goodweatherjava.db.bean.AirResponse;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.db.bean.HourlyResponse;
 import com.acg.goodweatherjava.db.bean.LifestyleResponse;
@@ -168,6 +169,37 @@ public class WeatherRepository {
                     @Override
                     public void onFailure(Throwable e) {
                         failed.postValue(type + e.getMessage());
+                    }
+                }));
+    }
+
+    /**
+     * 空气污染指数
+     * @param airResponseLiveData
+     * @param failed
+     * @param cityId
+     */
+    public void airWeather(MutableLiveData<AirResponse> airResponseLiveData,
+                           MutableLiveData<String> failed,String cityId){
+        String type = "空气污染指数--->";
+        NetworkApi.createService(ApiService.class,ApiType.WEATHER).airWeather(cityId)
+                .compose(NetworkApi.applySchedulers(new BaseObserver<AirResponse>() {
+                    @Override
+                    public void onSuccess(AirResponse airResponse) {
+                        if (airResponse == null){
+                            failed.postValue("空气污染指数为null,请检查城市ID是否正确！");
+                            return;
+                        }
+                        if (Constant.SUCCESS.equals(airResponse.getCode())){
+                            airResponseLiveData.postValue(airResponse);
+                        }else {
+                            failed.postValue(type+airResponse.getCode());
+                        }
+                    }
+                    @Override
+                    public void onFailure(Throwable e) {
+                        Log.e(TAG, "onFailure: " + e.getMessage());
+                        failed.postValue(type+e.getMessage());
                     }
                 }));
     }

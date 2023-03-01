@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.acg.goodweatherjava.Constant;
 import com.acg.goodweatherjava.R;
+import com.acg.goodweatherjava.db.bean.AirResponse;
 import com.acg.goodweatherjava.db.bean.HourlyResponse;
 import com.acg.goodweatherjava.location.GoodLocation;
 import com.acg.goodweatherjava.ui.adapter.DailyAdapter;
@@ -180,6 +181,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                     mViewModel.dailyWeather(id);
                     mViewModel.lifestyle(id);
                     mViewModel.hourly(id);
+                    mViewModel.airWeather(id);
                 }
             }
         });
@@ -187,7 +189,8 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
         mViewModel.nowResponseMutableLiveData.observe(this, nowResponse -> {
             NowResponse.NowBean now = nowResponse.getNow();
             if (now != null) {
-                mBinding.tvInfo.setText(now.getText());
+                mBinding.tvWeek.setText(EasyDate.getTodayOfWeek());
+                mBinding.tvWeatherInfo.setText(now.getText());
                 mBinding.tvTemp.setText(now.getTemp());
                 // 精简更新时间
                 String time = EasyDate.updateTime(nowResponse.getUpdateTime());
@@ -241,6 +244,34 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
             if (mHourlyBeanList.size()>0) mHourlyBeanList.clear();
             mHourlyBeanList.addAll(hourlyBeans);
             mHourlyAdapter.notifyDataSetChanged();
+        });
+        // 空气污染指数返回
+        mViewModel.airResponseMutableLiveData.observe(this,airResponse -> {
+            AirResponse.NowBean now = airResponse.getNow();
+            if (now == null) return;
+            mBinding.rpbAqi.setMaxProgress(300);//最大进度，用于计算
+            mBinding.rpbAqi.setMinText("0");//设置显示最小值
+            mBinding.rpbAqi.setMinTextSize(32f);
+            mBinding.rpbAqi.setMaxText("300");//设置显示最大值
+            mBinding.rpbAqi.setMaxTextSize(32f);
+            mBinding.rpbAqi.setProgress(Float.parseFloat(now.getAqi()));//当前进度
+            mBinding.rpbAqi.setArcBgColor(getColor(R.color.arc_bg_color));//圆弧的颜色
+            mBinding.rpbAqi.setProgressColor(getColor(R.color.arc_progress_color));//进度圆弧的颜色
+            mBinding.rpbAqi.setFirstText(now.getCategory());//空气质量描述 取值范围：优，良，轻度污染，中度污染，重度污染，严重污染
+            mBinding.rpbAqi.setFirstTextSize(44f);//第一行文本的字体大小
+            mBinding.rpbAqi.setSecondText(now.getAqi());//空气质量值
+            mBinding.rpbAqi.setSecondTextSize(64f);//第二行文本的字体大小
+            mBinding.rpbAqi.setMinText("0");
+            mBinding.rpbAqi.setMinTextColor(getColor(R.color.arc_progress_color));
+
+            mBinding.tvAirInfo.setText(String.format("空气%s", now.getCategory()));
+
+            mBinding.tvPm10.setText(now.getPm10());//PM10
+            mBinding.tvPm25.setText(now.getPm2p5());//PM2.5
+            mBinding.tvNo2.setText(now.getNo2());//二氧化氮
+            mBinding.tvSo2.setText(now.getSo2());//二氧化硫
+            mBinding.tvO3.setText(now.getO3());//臭氧
+            mBinding.tvCo.setText(now.getCo());//一氧化碳
         });
 
         // 错误信息返回

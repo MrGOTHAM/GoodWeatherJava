@@ -2,6 +2,7 @@ package com.acg.goodweatherjava.viewModel;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.acg.goodweatherjava.db.bean.AirResponse;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.db.bean.HourlyResponse;
 import com.acg.goodweatherjava.db.bean.LifestyleResponse;
@@ -35,6 +36,8 @@ public class MainViewModel extends BaseViewModel {
     public MutableLiveData<List<Province>> cityMutableLiveData = new MutableLiveData<>();
 
     public MutableLiveData<HourlyResponse> hourlyResponseMutableLiveData = new MutableLiveData<>();
+
+    public MutableLiveData<AirResponse> airResponseMutableLiveData = new MutableLiveData<>();
 
     /**
      * 搜索城市
@@ -80,6 +83,13 @@ public class MainViewModel extends BaseViewModel {
         WeatherRepository.getInstance().hourly(hourlyResponseMutableLiveData, failed, cityId);
     }
 
+    /**
+     * 空气污染指数
+     * @param cityId    城市ID
+     */
+    public void airWeather(String cityId){
+        WeatherRepository.getInstance().airWeather(airResponseMutableLiveData,failed,cityId);
+    }
     /**
      * 获取城市数据
      */
