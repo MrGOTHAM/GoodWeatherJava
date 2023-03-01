@@ -20,8 +20,10 @@ import android.view.View;
 
 import com.acg.goodweatherjava.Constant;
 import com.acg.goodweatherjava.R;
+import com.acg.goodweatherjava.db.bean.HourlyResponse;
 import com.acg.goodweatherjava.location.GoodLocation;
 import com.acg.goodweatherjava.ui.adapter.DailyAdapter;
+import com.acg.goodweatherjava.ui.adapter.HourlyAdapter;
 import com.acg.goodweatherjava.ui.adapter.LifestyleAdapter;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
 import com.acg.goodweatherjava.db.bean.LifestyleResponse;
@@ -30,6 +32,7 @@ import com.acg.goodweatherjava.db.bean.SearchCityResponse;
 import com.acg.goodweatherjava.databinding.ActivityMainBinding;
 import com.acg.goodweatherjava.location.LocationCallback;
 import com.acg.goodweatherjava.utils.CityDialog;
+import com.acg.goodweatherjava.utils.EasyDate;
 import com.acg.goodweatherjava.utils.GlideUtils;
 import com.acg.goodweatherjava.utils.MVUtils;
 import com.acg.goodweatherjava.viewModel.MainViewModel;
@@ -73,6 +76,10 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
     //是否正在刷新
     private boolean isRefresh;
 
+    // 逐小时天气预报
+    private final List<HourlyResponse.HourlyBean> mHourlyBeanList = new ArrayList<>();
+    private final HourlyAdapter mHourlyAdapter = new HourlyAdapter(mHourlyBeanList);
+
 
 
     /**
@@ -108,6 +115,10 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                 }
             }
         });
+        LinearLayoutManager hourlyLayoutManager = new LinearLayoutManager(this);
+        hourlyLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mBinding.rvHourly.setLayoutManager(hourlyLayoutManager);
+        mBinding.rvHourly.setAdapter(mHourlyAdapter);
     }
 
     /**
@@ -168,6 +179,7 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                     mViewModel.nowWeather(id);
                     mViewModel.dailyWeather(id);
                     mViewModel.lifestyle(id);
+                    mViewModel.hourly(id);
                 }
             }
         });
@@ -177,7 +189,9 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
             if (now != null) {
                 mBinding.tvInfo.setText(now.getText());
                 mBinding.tvTemp.setText(now.getTemp());
-                mBinding.tvUpdateTime.setText("最近更新时间：" + nowResponse.getUpdateTime());
+                // 精简更新时间
+                String time = EasyDate.updateTime(nowResponse.getUpdateTime());
+                mBinding.tvUpdateTime.setText(String.format("最近更新时间：%s%s", EasyDate.showTimeInfo(time), time));
 
                 mBinding.tvWindDirection.setText("风向     " + now.getWindDir());//风向
                 mBinding.tvWindPower.setText("风力     " + now.getWindScale() + "级");//风力
@@ -195,6 +209,9 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
                 }
                 mDailyBeanList.addAll(dailyBeans);
                 mDailyAdapter.notifyDataSetChanged();
+                // 设置当天最高温和最低温
+                mBinding.tvHeight.setText(String.format("%s℃", dailyBeans.get(0).getTempMax()));
+                mBinding.tvLow.setText(String.format(" / %s℃", dailyBeans.get(0).getTempMin()));
             }
         });
         // 生活指数返回
@@ -213,6 +230,17 @@ public class MainActivity extends NetworkActivity<ActivityMainBinding> implement
             //城市弹窗初始化
             cityDialog = CityDialog.getInstance(MainActivity.this, provinces);
             cityDialog.setSelectedCityCallback(this);
+        });
+        // 逐小时天气预报返回
+        mViewModel.hourlyResponseMutableLiveData.observe(this,hourlyResponse -> {
+            List<HourlyResponse.HourlyBean> hourlyBeans = hourlyResponse.getHourly();
+            if (hourlyBeans == null){
+                showToast("未获取到逐小时天气预报！");
+                return;
+            }
+            if (mHourlyBeanList.size()>0) mHourlyBeanList.clear();
+            mHourlyBeanList.addAll(hourlyBeans);
+            mHourlyAdapter.notifyDataSetChanged();
         });
 
         // 错误信息返回

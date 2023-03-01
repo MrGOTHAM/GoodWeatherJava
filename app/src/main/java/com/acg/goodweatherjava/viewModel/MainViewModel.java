@@ -3,6 +3,7 @@ package com.acg.goodweatherjava.viewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.db.bean.HourlyResponse;
 import com.acg.goodweatherjava.db.bean.LifestyleResponse;
 import com.acg.goodweatherjava.db.bean.NowResponse;
 import com.acg.goodweatherjava.db.bean.Province;
@@ -33,6 +34,8 @@ public class MainViewModel extends BaseViewModel {
 
     public MutableLiveData<List<Province>> cityMutableLiveData = new MutableLiveData<>();
 
+    public MutableLiveData<HourlyResponse> hourlyResponseMutableLiveData = new MutableLiveData<>();
+
     /**
      * 搜索城市
      *
@@ -53,18 +56,28 @@ public class MainViewModel extends BaseViewModel {
 
     /**
      * 每日天气
+     *
      * @param cityId 城市ID
      */
-    public void dailyWeather(String cityId){
-        WeatherRepository.getInstance().dailyWeather(dailyWeatherResponseMutableLiveData,failed,cityId);
+    public void dailyWeather(String cityId) {
+        WeatherRepository.getInstance().dailyWeather(dailyWeatherResponseMutableLiveData, failed, cityId);
     }
 
     /**
      * 生活指数
-     * @param cityId    城市ID
+     *
+     * @param cityId 城市ID
      */
-    public void lifestyle(String cityId){
-        WeatherRepository.getInstance().lifeStyle(lifestyleResponseMutableLiveData,failed,cityId);
+    public void lifestyle(String cityId) {
+        WeatherRepository.getInstance().lifeStyle(lifestyleResponseMutableLiveData, failed, cityId);
+    }
+
+    /**
+     * 逐小时天气预报
+     * @param cityId   城市ID
+     */
+    public void hourly(String cityId) {
+        WeatherRepository.getInstance().hourly(hourlyResponseMutableLiveData, failed, cityId);
     }
 
     /**

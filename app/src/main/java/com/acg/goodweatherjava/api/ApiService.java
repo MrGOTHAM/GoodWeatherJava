@@ -4,6 +4,7 @@ import static com.acg.goodweatherjava.Constant.API_KEY;
 
 import com.acg.goodweatherjava.db.bean.BingResponse;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.db.bean.HourlyResponse;
 import com.acg.goodweatherjava.db.bean.LifestyleResponse;
 import com.acg.goodweatherjava.db.bean.NowResponse;
 import com.acg.goodweatherjava.db.bean.SearchCityResponse;
@@ -53,6 +54,14 @@ public interface ApiService {
      */
     @GET("v7/indices/1d?key="+API_KEY)
     Observable<LifestyleResponse> lifestyle(@Query("type") String types,@Query("location") String cityId);
+
+    /**
+     * 逐小时天气预报
+     * @param location  地区ID，可以通过searchCity()接口的得到
+     * @return
+     */
+    @GET("v7/weather/24h?key="+API_KEY)
+    Observable<HourlyResponse> hourly(@Query("location")String location);
 
     /**
      * 必应图片

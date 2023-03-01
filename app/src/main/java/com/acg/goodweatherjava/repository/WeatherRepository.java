@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.acg.goodweatherjava.Constant;
 import com.acg.goodweatherjava.api.ApiService;
 import com.acg.goodweatherjava.db.bean.DailyWeatherResponse;
+import com.acg.goodweatherjava.db.bean.HourlyResponse;
 import com.acg.goodweatherjava.db.bean.LifestyleResponse;
 import com.acg.goodweatherjava.db.bean.NowResponse;
 import com.acg.library.network.ApiType;
@@ -109,9 +110,10 @@ public class WeatherRepository {
 
     /**
      * 生活指数
-     * @param responseLiveData  来自viewModel的数据，这里给他更新
-     * @param failed            失败的数据
-     * @param cityId            城市ID
+     *
+     * @param responseLiveData 来自viewModel的数据，这里给他更新
+     * @param failed           失败的数据
+     * @param cityId           城市ID
      */
     public void lifeStyle(MutableLiveData<LifestyleResponse> responseLiveData,
                           MutableLiveData<String> failed, String cityId) {
@@ -134,6 +136,37 @@ public class WeatherRepository {
                     @Override
                     public void onFailure(Throwable e) {
                         Log.e(TAG, "onFailure: " + e.getMessage());
+                        failed.postValue(type + e.getMessage());
+                    }
+                }));
+    }
+
+    /**
+     * 逐小时天气预报
+     * @param responseLiveData  viewModel里的livedata数据
+     * @param failed    失败
+     * @param cityId    城市ID
+     */
+    public void hourly(MutableLiveData<HourlyResponse> responseLiveData,
+                       MutableLiveData<String> failed, String cityId) {
+        String type = "逐小时天气预报--->";
+        NetworkApi.createService(ApiService.class, ApiType.WEATHER).hourly(cityId)
+                .compose(NetworkApi.applySchedulers(new BaseObserver<HourlyResponse>() {
+                    @Override
+                    public void onSuccess(HourlyResponse hourlyResponse) {
+                        if (hourlyResponse == null) {
+                            failed.postValue("逐小时天气预报为null，请检查城市ID是否正确！");
+                            return;
+                        }
+                        if (Constant.SUCCESS.equals(hourlyResponse.getCode())) {
+                            responseLiveData.postValue(hourlyResponse);
+                        } else {
+                            failed.postValue(type + hourlyResponse.getCode());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable e) {
                         failed.postValue(type + e.getMessage());
                     }
                 }));
